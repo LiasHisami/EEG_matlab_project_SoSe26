@@ -10,6 +10,7 @@ If we have time, we can extend the analysis to H2 concerning standards/deviants 
 ## Data
 **Important**: When downloading the raw data from the link Gian sent us, we are **GROUP 2**.
 It's a bit confusing because the EEG/behavioural data are labelled ID01 although we are Group 2.
+https://box.fu-berlin.de/s/wcqaegfkdkMZo3E?dir=/Group2
 
 So in summary:
 - for 00Behavioral and 01EEG, our participant is labelled ID01
