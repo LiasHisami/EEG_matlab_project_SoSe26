@@ -60,11 +60,12 @@ First ideas for things we could still check/do:
     3. We can then use classical SPM to identify locations in space and time in which a reliable difference occurs, correcting across the multiple comparisons entailed
    
    Tutorial for detailed implementation:
-      Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
+  
+   - Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
     
-    SPM will take some time as it writes out a NIfTI image for each condition in a new directory called aefdfMspmeeg_subject1. In our case there will be two files , called condition_rare and condition_standard. These are 4D files, meaning that each file contains multiple 3D scalp x time images, corresponding to non-rejected trials. You can press “Display: images” to view one of these images. Change the number in the ‘Frames’ box to select a particular trial (first trial is the default). The image will have dimensions 3232101.
+   - SPM will take some time as it writes out a NIfTI image for each condition in a new directory called aefdfMspmeeg_subject1. In our case there will be two files , called condition_rare and condition_standard. These are 4D files, meaning that each file contains multiple 3D scalp x time images, corresponding to non-rejected trials. You can press “Display: images” to view one of these images. Change the number in the ‘Frames’ box to select a particular trial (first trial is the default). The image will have dimensions 3232101.
     
-    To perform statistical inference on these images:
+  To perform statistical inference on these images:
     
     - Create a new directory, eg. mkdir XYTstats.
     
