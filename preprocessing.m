@@ -64,9 +64,6 @@ D = spm_interpolate_bad_channels(D);{}
  
 %% Montage
 
-% if you want to use interpolated data use interpolate_SPNCartoons_ID01.mat + prefix evertime you specify the data
-% not done here because no bad channels where found
-
 S = [];
 S.D = 'interpolate_SPNCartoons_ID01.mat';
 S.mode = 'write';
