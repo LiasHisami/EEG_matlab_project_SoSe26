@@ -40,18 +40,27 @@ First ideas for things we could still check/do:
 - **Bad-channel handling**
   - so far, the script asks the user to visually determine and enter the bad channels themselves
   - means different people could identify different channels
-  - we should decide which channels are considered bad and why and ideally code this consistently into the script?
+  - we should decide which channels are considered bad and why and ideally code this consistently into the script? -> already done, bad channel is CP3 and parts of O2 and CP5 (todo: check if those channels are removed in artefact detection part)
 
 - **ERP region of interest (ROI)**
   - we should determine which electrodes constitute our ROI and justify this choice based on current literature
 
 - **P50 time window**
   - we need to define exactly which time period counts as the P50, for example `50–70 ms` after stimulation
-  - instead of comparing the EEG amplitude at exactly 50 ms, we can calculate the average amplitude within this time window, which gives us a more stable measure of the P50?
+  - instead of comparing the EEG amplitude at exactly 50 ms, we can calculate the average amplitude within this time window, which gives us a more stable measure of the P50? -> maybe not necessary because we do the statistical analysis anyways, for descriptive comparison we can look at example report how they did it)
 
 - **Final statistical analysis**
-  - we still need to decide how we will statistically compare the High- and Low-intensity conditions for H1
-
+  - we still need to decide how we will statistically compare the High- and Low-intensity conditions for H1 -> like in tutorial part 'Sensor space analysis' see https://www.fil.ion.ucl.ac.uk/spm/docs/tutorials/MEEG/mmn/:
+ 
+    "A useful feature of SPM is the ability to use Random Field Theory to correct for multiple statistical comparisons across N-dimensional spaces [...] This would allow one to identify locations where, for example, the ERP amplitude in two conditions at a given timepoint differed reliably across subjects, having corrected for the multiple t-tests performed across pixels. That correction uses Random Field Theory, which takes into account the spatial correlation across pixels (i.e, that the tests are not independent)"
+ 
+    Steps of statistical analysis:
+    1. first create a 3D image for each trial of the two types, with dimensions MxMxS, where S=101 is the number of samples (time points)
+    2. We then take these images into an unpaired t-test across trials (in a 2nd-level model) to compare the two events
+    3. We can then use classical SPM to identify locations in space and time in which a reliable difference occurs, correcting across the multiple comparisons entailed
+   
+  look at tutorial for detailed implementation 
+    
 ---
 
 
@@ -98,6 +107,7 @@ The folders original_data/ and preprocessed/ are local folders and should be exc
 ## `preprocessing.m`
 
 This is the **main EEG preprocessing pipeline**.
+It is based on the official SPM MMN tutorial https://www.fil.ion.ucl.ac.uk/spm/docs/tutorials/MEEG/mmn/ and on the course EEG Data analysis of the program Cognitive Neuroscience at FU Berlin given be Gianluigi Giannini and Prof. Felix Blankenburg
 
 Currently does:
 1. BDF → SPM conversion
