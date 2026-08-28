@@ -55,12 +55,36 @@ First ideas for things we could still check/do:
     "A useful feature of SPM is the ability to use Random Field Theory to correct for multiple statistical comparisons across N-dimensional spaces [...] This would allow one to identify locations where, for example, the ERP amplitude in two conditions at a given timepoint differed reliably across subjects, having corrected for the multiple t-tests performed across pixels. That correction uses Random Field Theory, which takes into account the spatial correlation across pixels (i.e, that the tests are not independent)"
  
     Steps of statistical analysis:
-    1. first create a 3D image for each trial of the two types, with dimensions MxMxS, where S=101 is the number of samples (time points)
+    1. Convert EEG data to scalp x time nifty images -> a 3D image for each trial of the two types with time as third dimension;  
     2. We then take these images into an unpaired t-test across trials (in a 2nd-level model) to compare the two events
     3. We can then use classical SPM to identify locations in space and time in which a reliable difference occurs, correcting across the multiple comparisons entailed
    
-  look at tutorial for detailed implementation 
+   Tutorial for detailed implementation:
+      Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
     
+    SPM will take some time as it writes out a NIfTI image for each condition in a new directory called aefdfMspmeeg_subject1. In our case there will be two files , called condition_rare and condition_standard. These are 4D files, meaning that each file contains multiple 3D scalp x time images, corresponding to non-rejected trials. You can press “Display: images” to view one of these images. Change the number in the ‘Frames’ box to select a particular trial (first trial is the default). The image will have dimensions 3232101.
+    
+    To perform statistical inference on these images:
+    
+    - Create a new directory, eg. mkdir XYTstats.
+    
+    - Press the “Specify 2nd level” button.
+    
+    - Select “two-sample t-test” (unpaired t-test)
+    
+    - Define the images for “Group 1” as all those in the file condition_standard. To do that write ‘standard’ in the ‘Filter’ box and ‘Inf’ in the ‘Frames’ box of the file selector. All the frames will be shown. Right click on any of the frames in the list and choose ‘Select all’. Similarly for “Group 2” select the images from condition_rare file.
+    
+    - Finally, specify the new XYTstats directory as the output directory.
+    
+    - Press the “save” icon, top left, and save this design specification as mmn_design.mat and press “save”.
+    
+    - Press the green “Run” button to execute the job4 This will produce the design matrix for a two-sample t-test.
+    
+    - Now press “Estimate” in SPMs main window, and select the SPM.mat file from the XYTstats directory. 
+
+    - Now press “Results” and define a new F-contrast as [1 -1] (for help with these basic SPM functions, see eg. chapter [Chap:data:auditory]). Keep the default contrast options, but threshold at  FWE p < 0.05 corrected for the whole search volume and select “Scalp-Time” for the “Data Type”. Then press “whole brain”, and the Graphics window should now look like that in Figure 1.3. This reveals a large fronto-central region within the 2D sensor space and within the time epoch in which standard and rare trials differ reliably, having corrected for multiple F-tests across pixels/time. An F-test is used because the sign of the difference reflects the polarity of the ERP difference, which is not of primary interest.
+ 
+      
 ---
 
 
