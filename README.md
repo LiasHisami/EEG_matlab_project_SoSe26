@@ -59,7 +59,7 @@ First ideas for things we could still check/do:
     2. We then take these images into an unpaired t-test across trials (in a 2nd-level model) to compare the two events
     3. We can then use classical SPM to identify locations in space and time in which a reliable difference occurs, correcting across the multiple comparisons entailed
    
-   Tutorial for detailed implementation:
+   SPM tutorial for detailed implementation of statistical analysis:
   
    - Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
     
