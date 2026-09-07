@@ -14,8 +14,8 @@ function D2 = spm_interpolate_bad_channels(D)
     cfg = [];
     cfg.length = 10;
     cfg.overlap = 0;
-    data_epoched = ft_redefinetrial(cfg, data);
-
+    %data_epoched = ft_redefinetrial(cfg, data);
+    data_epoched = data;
     cfg = [];
     cfg.preproc.demean = 'yes';
     cfg.preproc.lpfilter = 'yes'; 
@@ -24,7 +24,11 @@ function D2 = spm_interpolate_bad_channels(D)
     cfg.preproc.hpfreq = 1; 
     cfg.preproc.hpinstabilityfix = 'reduce'; 
     cfg.ylim = [-20 20];
-    ft_databrowser(cfg, data_epoched);
+    % ft_databrowser(cfg, data_epoched);
+    if isfield(cfg,'colormap')
+        cfg = rmfield(cfg,'colormap');
+    end  % optional safety
+    %ft_databrowser(cfg, data_epoched);  % COMMENT OUT
 
     % Let user input bad channels
     disp('Channel labels:');
@@ -42,21 +46,21 @@ function D2 = spm_interpolate_bad_channels(D)
         cfg.badchannel    = bad_labels;
         %cfg.neighbours = neighbours;
         data_corr = ft_channelrepair(cfg, data);
+       
     else
         data_corr = data;
     end
 
+   
     D2 = D.copy(['interpolate_' fname(D)]);
 
-    % Safely map repaired data back into the D2 object by channel name
-    % This handles cases where FieldTrip removes non-EEG (e.g. EOG) channels during interpolation
-    for c = 1:numel(data_corr.label)
-        idx = D2.indchannel(data_corr.label{c});
-        if ~isempty(idx)
-            D2(idx, :) = data_corr.trial{1,1}(c, :);
-        end
+    %check that dimension match
+    if numel(indchantype(D, 'EEG')) == numel(data_corr.label)
+        D2(indchantype(D,'EEG'),:) = data_corr.trial{1,1};
+        D2.save();
+    else
+        error('something went wrong with channel indices')
     end
-    D2.save();
-
+    
     fprintf('Done. Saved interpolated data as: %s\n', fullfile(D2.path, [D2.fname]));
 end
