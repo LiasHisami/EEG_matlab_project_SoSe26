@@ -169,7 +169,7 @@ Currently does:
 
 Helper function called by `preprocessing.m`.
 
-- displays the EEG data,
+- displays the EEG data if not commented out
 - asks the user to enter bad-channel labels,
 - interpolates selected channels using spline interpolation,
 - saves the interpolated SPM dataset.
@@ -185,9 +185,6 @@ Helper function for visual inspection of continuous or epoched SPM EEG data.
 Mainly intended for:
 - quality control
 - checking artefacts
-- debugging
-
-It does not normally need to be run as part of the main pipeline.
 
 ---
 
@@ -206,12 +203,7 @@ Run this **after preprocessing has been completed**.
 
 ---
 
-# Current execution order
-
-> [!IMPORTANT]
-> The current version of the pipeline cannot yet be run completely from top to bottom without interruption because `generate_avref.m` requires an interpolated SPM file, while the Montage section of `preprocessing.m` already expects `avref.mat` to exist.
-
-For now, use the following order.
+# Execution order
 
 ## 1. Run `preprocessing.m`
 
