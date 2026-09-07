@@ -4,7 +4,7 @@ For the minimum viable analysis, we are currently focusing on H1: the effect of 
 The experiment contains two stimulation intensities: low-intensity and high-intensity stimulation
 
 The analysis currently compares the EEG response to these two conditions.
-If we have time, we can extend the analysis to H2 concerning standards/deviants in the roving paradigm.
+TODO: If we have time, we can extend the analysis to H2 concerning standards/deviants in the roving paradigm.
 
 
 ## Data
@@ -23,36 +23,88 @@ Brewermap?
 
 The custom bad-channel interpolation and data-display functions use FieldTrip functions such as ft_databrowser, ft_redefinetrial, and ft_channelrepair.
 
-Perhaps we should ideally use the same SPM version, and agree on one version?
-All group members should ideally use the same SPM version. Add the exact agreed version here once confirmed
+used version: SPM25
 
+## Preprocessing:
+--> see preprocessing plots for CP3 (bad interpolated channel) and C4 (of interest for our P50 Hypothesis) and maybe AFz (due to eye blink detection)
 
+### Bad-channel handling
 
-## Notes
+**ID01:** 
+- Bad channel is CP3 -> interpolated
+- Parts of O2 and CP5 are also bad (from around 1600s to 2020s)
+    -> removed during artefact detection (one long section from trial 1031 to 1274 (total around 244 ) see below 'Artefact detection'
 
-First ideas for things we could still check/do:
+**For all additional participants:**
+  - TODO: decide which channels are considered bad
 
-- **Path handling**
-  - scripts currently contain absolute paths that are specific to one laptop
-  - For now, these can be adapted manually by each group member so that we can first check whether the pipeline runs correctly on different computers
-  - Once the pipeline has been verified, we should replace the laptop-specific absolute paths with relative/project-based paths so that the scripts can be used without manually changing every file path
+### Montage
 
-- **Bad-channel handling**
-  - so far, the script asks the user to visually determine and enter the bad channels themselves
-  - means different people could identify different channels
-  - we should decide which channels are considered bad and why and ideally code this consistently into the script? -> already done, bad channel is CP3 and parts of O2 and CP5 (todo: check if those channels are removed in artefact detection part)
+- Uses 'avref-eog.mat' file (generated through GUI in SPM)
+- average referencing + combining VEOG and HEOG channels into one channel respectively
 
-- **ERP region of interest (ROI)**
-  - we should determine which electrodes constitute our ROI and justify this choice based on current literature
+### High-pass filter
 
-- **P50 time window**
-  - we need to define exactly which time period counts as the P50, for example `50–70 ms` after stimulation
-  - instead of comparing the EEG amplitude at exactly 50 ms, we can calculate the average amplitude within this time window, which gives us a more stable measure of the P50? -> maybe not necessary because we do the statistical analysis anyways, for descriptive comparison we can look at example report how they did it)
+- 0.1 Hz
 
-- **Final statistical analysis**
-  - we still need to decide how we will statistically compare the High- and Low-intensity conditions for H1 -> like in tutorial part 'Sensor space analysis' see https://www.fil.ion.ucl.ac.uk/spm/docs/tutorials/MEEG/mmn/:
+### Downsampling
+
+- from original 1024 Hz to 200 Hz
+
+### Low-pass filter
+
+- 30 Hz
+
+### Eye blink removal
+
+- creating epoched events around eyeblinks and then averaging
+->see plots for eye blink detection
+
+### Epoching
+
+#### H1
+
+- time window: -100 to 400 ms
+- conditions:
+  - High : 1650 trials
+  - Low :  1697 trials
+Total:     3347 trials
+
++ Baseline correction: 1
+
+#### H2
+
+- TODO....
+
+### Artefact detection
+
+**ID01:**
+
+461 rejected trials:
+
+bad trials rejected: 
+118   121   159   169   208   209   237   323   351   374   375   376   379   452   453   542   635   643   649   656   709   724   725   726   750   767   780   811   817   818   819   846   873   904   949   981  1031  1033  1034  1035  1036  1037  1038  1039  1040  1041  1042  1043  1044  1045  1046  1047  1048  1049  1050  1051  1052  1053  1054  1055  1056  1057  1058  1059  1060  1061  1062  1063  1064  1065  1066  1067  1068  1069  1070  1071  1072  1073  1074  1075  1076  1077  1078  1079  1080  1081  1082  1083  1084  1085  1086  1087  1088  1089  1090  1091  1092  1093  1094  1095  1096  1097  1098  1099  1100  1101  1102  1103  1104  1105  1106  1107  1108  1109  1110  1111  1112  1113  1114  1115  1116  1117  1118  1119  1120  1121  1122  1123  1124  1125  1126  1127  1128  1129  1130  1131  1132  1133  1134  1135  1136  1137  1138  1139  1140  1141  1142  1143  1144  1145  1146  1147  1148  1149  1150  1151  1152  1153  1154  1155  1156  1157  1158  1159  1160  1161  1162  1163  1164  1165  1166  1167  1168  1169  1170  1171  1172  1173  1174  1175  1176  1177  1178  1179  1180  1181  1182  1183  1184  1185  1186  1187  1188  1189  1190  1191  1192  1193  1194  1195  1196  1197  1198  1199  1200  1201  1202  1203  1204  1205  1206  1207  1208  1209  1210  1211  1212  1213  1214  1215  1216  1217  1218  1219  1220  1221  1222  1223  1224  1225  1226  1227  1228  1229  1230  1231  1232  1233  1234  1235  1236  1237  1238  1239  1240  1241  1242  1243  1244  1245  1246  1247  1248  1249  1250  1251  1252  1253  1254  1255  1256  1257  1258  1259  1260  1261  1262  1263  1264  1265  1266  1267  1268  1269  1270  1271  1272  1273  1274  1307  1410  1548  1601  1604  1614  1618  1619  1636  1640  1644  1645  1647  1650  1654  1660  1661  1662  1667  1668  1669  1670  1674  1676  1680  1682  1685  1687  1688  1692  1694  1696  1697  1704  1710  1711  1713  1716  1718  1735  1738  1749  1758  1764  1773  1774  1775  1776  1785  1786  1815  1823  1828  1832  1834  1838  1848  1849  1853  1861  1877  1884  1886  1894  1904  1935  1960  1961  1962  1963  1964  1966  1982  2005  2017  2031  2041  2047  2049  2064  2073  2219  2220  2226  2233  2235  2247  2276  2278  2279  2307  2341  2360  2365  2372  2373  2379  2380  2381  2437  2438  2463  2494  2495  2496  2497  2499  2502  2503  2639  2666  2693  2694  2695  2696  2697  2698  2699  2700  2702  2703  2704  2705  2706  2707  2708  2709  2710  2730  2731  2798  2799  2802  2805  2806  2811  2827  2829  2833  2834  2835  2843  2856  2868  2965  3002  3003  3004  3005  3006  3007  3008  3009  3010  3012  3013  3017  3018  3019  3020  3021  3023  3027  3030  3031  3039  3040  3044  3046  3047  3048  3049  3050  3051  3099  3129  3131  3208  3217  3222  3234  3253
+
+### Additional steps for descriptive analysis
+
+- Averaging and Reapplied Low pass filtering
+
+## Descriptive analysis
+
+**ID01 H1:**
+
+- Topographic plots around P50 (see plots folder)
+
+- ERP
+  - Electrodes that constitute our ROI: {'FC4', 'CP4', 'C4', 'C6'} (based on topography plot, might need to be changed for other participants and for H2)
  
-    "A useful feature of SPM is the ability to use Random Field Theory to correct for multiple statistical comparisons across N-dimensional spaces [...] This would allow one to identify locations where, for example, the ERP amplitude in two conditions at a given timepoint differed reliably across subjects, having corrected for the multiple t-tests performed across pixels. That correction uses Random Field Theory, which takes into account the spatial correlation across pixels (i.e, that the tests are not independent)"
+
+## Final statistical analysis
+
+**ID01 H1:**
+  - done as in spm tutorial see https://www.fil.ion.ucl.ac.uk/spm/docs/tutorials/MEEG/mmn/:
+
+  - testing hypothesis using a three-dimensional scalp-time map based on a t-contrast testing for high > low, applying SPM’s random field theory-based family-wise error rate correction with a p-value criterion of .05, which takes into account the spatial correlation across pixels
  
     Steps of statistical analysis:
     1. Convert EEG data to scalp x time nifty images -> a 3D image for each trial of the two types with time as third dimension;  
@@ -61,11 +113,11 @@ First ideas for things we could still check/do:
    
    SPM tutorial for detailed implementation of statistical analysis:
   
-   - Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
-    
-   - SPM will take some time as it writes out a NIfTI image for each condition in a new directory called aefdfMspmeeg_subject1. In our case there will be two files , called condition_rare and condition_standard. These are 4D files, meaning that each file contains multiple 3D scalp x time images, corresponding to non-rejected trials. You can press “Display: images” to view one of these images. Change the number in the ‘Frames’ box to select a particular trial (first trial is the default). The image will have dimensions 3232101.
-    
-  To perform statistical inference on these images:
+     - Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
+      
+     - SPM will take some time as it writes out a NIfTI image for each condition in a new directory called aefdfMspmeeg_subject1. In our case there will be two files , called condition_rare and condition_standard. These are 4D files, meaning that each file contains multiple 3D scalp x time images, corresponding to non-rejected trials. You can press “Display: images” to view one of these images. Change the number in the ‘Frames’ box to select a particular trial (first trial is the default). The image will have dimensions 3232101.
+      
+    To perform statistical inference on these images:
     
     - Create a new directory, eg. mkdir XYTstats.
     
@@ -88,44 +140,6 @@ First ideas for things we could still check/do:
       
 ---
 
-
-## Suggested local folder structure
-
-After cloning the repository, the suggested structure is:
-
-```text
-EEG_project_SoSe26/
-│
-├── original_data/
-│   ├── 00Behavioral/
-│   ├── 01EEG/
-│   └── 05Anat/
-│
-├── preprocessed/
-│
-├── preprocessing.m
-├── generate_avref.m
-├── spm_interpolate_bad_channels.m
-├── display_SPM_data.m
-├── plot_preprocessing.m
-├── plot_ERP.m
-├── README.md
-└── .gitignore
-```
-
-The folders original_data/ and preprocessed/ are local folders and should be excluded from GitHub through .gitignore
-
-
-## Before running the analysis
-- Clone or download this repository.
-- Download the Group 2 raw data separately.
-- Place the downloaded data inside the original_data/ folder as shown above.
-- Make sure SPM is installed.
-- In the MATLAB scripts, set spm_path to the location of SPM on your own computer.
-- Make sure the expected .bdf and .sfp files can be found.
-- Do not change preprocessing parameters without informing the rest of the group
-
----
 
 # Scripts
 
@@ -164,16 +178,6 @@ Helper function called by `preprocessing.m`.
 
 ---
 
-## `generate_avref.m`
-
-Generates: `avref.mat`
-
-Contains the **average-reference montage** required by the montage stage of `preprocessing.m`.
-
-With the current pipeline, this script must be run **after conversion/bad-channel interpolation and before the Montage section of `preprocessing.m`**.
-
----
-
 ## `display_SPM_data.m`
 
 Helper function for visual inspection of continuous or epoched SPM EEG data.
@@ -209,43 +213,23 @@ Run this **after preprocessing has been completed**.
 
 For now, use the following order.
 
-## 1. Start `preprocessing.m`
+## 1. Run `preprocessing.m`
 
-Run the following sections:
-
-- `Setting Paths`
-- `Loading and Converting Data`
-- `Interpolating Bad Channels`
-
-Then **stop before the `Montage` section**.
+Use this to preprocess EEG Data. 
+Bad channels need to be written into the console when asked ({'CP3'} for ID01
+If you want to inspect the data to check for bad channels you can remove the following '%' in 'spm_interpolate_bad_channels' 
+`    %ft_databrowser(cfg, data_epoched);  % REMOVE COMMENT IF YOU WANT TO
+    %INSPECT THE DATA` (it is commented out to facilitate run time)
 
 ---
 
-## 2. Run `generate_avref.m`
-
-This creates:
-
-`avref.mat`
-
----
-
-## 3. Return to `preprocessing.m`
-
-Continue running the script starting from:
-
-`Montage`
-
-and proceed through the end of the preprocessing pipeline.
-
----
-
-## 4. Run `plot_preprocessing.m` — optional
+## 2. Run `plot_preprocessing.m` 
 
 Use this to inspect the effects of the different preprocessing stages.
 
 ---
 
-## 5. Run `plot_ERP.m`
+## 3. Run `plot_ERP.m`
 
 Use this to visualise the final **High vs Low** ERP comparison for H1.
 
