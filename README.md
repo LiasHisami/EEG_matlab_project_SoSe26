@@ -99,7 +99,7 @@ bad trials rejected:
   - Electrodes that constitute our ROI: {'FC4', 'CP4', 'C4', 'C6'} (based on topography plot, might need to be changed for other participants and for H2)
  
 
-## Final statistical analysis
+## Statistical analysis
 
 **ID01 H1:**
   - done as in spm tutorial see https://www.fil.ion.ucl.ac.uk/spm/docs/tutorials/MEEG/mmn/:
