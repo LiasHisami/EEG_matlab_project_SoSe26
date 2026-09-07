@@ -40,7 +40,7 @@ used version: SPM25
 
 ### Montage
 
-- Uses 'avref-eog.mat' file (generated through GUI in SPM)
+- Uses `avref-eog.mat` file (generated through GUI in SPM)
 - average referencing + combining VEOG and HEOG channels into one channel respectively
 
 ### High-pass filter
