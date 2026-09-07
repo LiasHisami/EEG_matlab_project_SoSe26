@@ -6,12 +6,12 @@ t_start   = 380;
 t_end     = 390;
 
 % Load each preprocessing stage
-D1 = spm_eeg_load('preprocessed/SPNCartoons_ID01.mat'); %raw
-D2 = spm_eeg_load('preprocessed/Minterpolate_SPNCartoons_ID01.mat'); %montage
-D3 = spm_eeg_load('preprocessed/fMinterpolate_SPNCartoons_ID01.mat'); % highpass filter
-D4 = spm_eeg_load('preprocessed/dfMinterpolate_SPNCartoons_ID01.mat'); %downsampled 
-D5 = spm_eeg_load('preprocessed/fdfMinterpolate_SPNCartoons_ID01.mat'); %lowpass filter
-D6 = spm_eeg_load('preprocessed/TfdfMinterpolate_SPNCartoons_ID01.mat'); % eyeblink removal
+D1 = spm_eeg_load('SPNCartoons_ID01.mat'); %raw
+D2 = spm_eeg_load('Minterpolate_SPNCartoons_ID01.mat'); %montage
+D3 = spm_eeg_load('fMinterpolate_SPNCartoons_ID01.mat'); % highpass filter
+D4 = spm_eeg_load('dfMinterpolate_SPNCartoons_ID01.mat'); %downsampled 
+D5 = spm_eeg_load('fdfMinterpolate_SPNCartoons_ID01.mat'); %lowpass filter
+D6 = spm_eeg_load('TfdfMinterpolate_SPNCartoons_ID01.mat'); % eyeblink removal
 
 % Find channel indices
 c1 = find(strcmp(D1.chanlabels, chan_name));
@@ -75,7 +75,7 @@ plot(t6, s6 + offsets(6), 'k', 'LineWidth', 0.3);
 
 % Labels
 text(t_start - 0.15, offsets(1), '1) raw data', 'HorizontalAlignment', 'right', 'FontSize', 12);
-text(t_start - 0.15, offsets(2), '2) montaged', 'HorizontalAlignment', 'right', 'FontSize', 12);
+text(t_start - 0.15, offsets(2), '2) interpolated + montaged', 'HorizontalAlignment', 'right', 'FontSize', 12);
 text(t_start - 0.15, offsets(3), '3) high pass filtered', 'HorizontalAlignment', 'right', 'FontSize', 12);
 text(t_start - 0.15, offsets(4), '4) downsampled', 'HorizontalAlignment', 'right', 'FontSize', 12);
 text(t_start - 0.15, offsets(5), '5) low pass filtered', 'HorizontalAlignment', 'right', 'FontSize', 12);
@@ -100,6 +100,4 @@ end
 xlabel('time (s)', 'FontSize', 12);
 xlim([t_start t_end]);
 set(gca, 'YTick', [], 'Box', 'off');
-title('Preprocessing steps - CP3', 'FontSize', 14);
-
-
+title(sprintf('Preprocessing steps - %s', chan_name), 'FontSize', 14)
