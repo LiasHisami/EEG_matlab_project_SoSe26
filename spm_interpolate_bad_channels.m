@@ -14,7 +14,6 @@ function D2 = spm_interpolate_bad_channels(D)
     cfg = [];
     cfg.length = 10;
     cfg.overlap = 0;
-    %data_epoched = ft_redefinetrial(cfg, data);
     data_epoched = data;
     cfg = [];
     cfg.preproc.demean = 'yes';
@@ -24,11 +23,11 @@ function D2 = spm_interpolate_bad_channels(D)
     cfg.preproc.hpfreq = 1; 
     cfg.preproc.hpinstabilityfix = 'reduce'; 
     cfg.ylim = [-20 20];
-    % ft_databrowser(cfg, data_epoched);
     if isfield(cfg,'colormap')
         cfg = rmfield(cfg,'colormap');
     end  % optional safety
-    %ft_databrowser(cfg, data_epoched);  % COMMENT OUT
+    %ft_databrowser(cfg, data_epoched);  % REMOVE COMMENT IF YOU WANT TO
+    %INSPECT THE DATA
 
     % Let user input bad channels
     disp('Channel labels:');
