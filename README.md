@@ -18,8 +18,10 @@ So in summary:
 
 
 ## Requirements
-MATLAB, SPM for EEG/MEG analysis, FieldTrip functions accessible from MATLAB/SPM
-Brewermap?
+- MATLAB
+- SPM for EEG/MEG analysis
+- FieldTrip functions accessible from MATLAB/SPM
+- Brewermap package -> download here: https://github.com/DrosteEffect/BrewerMap/tree/master
 
 The custom bad-channel interpolation and data-display functions use FieldTrip functions such as ft_databrowser, ft_redefinetrial, and ft_channelrepair.
 
