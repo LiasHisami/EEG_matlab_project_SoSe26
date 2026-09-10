@@ -241,19 +241,25 @@ load('/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/preprocessing_ID0
 % convert condition labels to a string array
 conds_str = string(conditionlabels);
 
-% identify intensity transitions
-% a) deviant = trial immediately after each change
-% b) standard = trial immediately before each change
-Dev_pos = find(conds_str(2:end) ~= conds_str(1:end-1)) + 1;
+% identify adjacent trials that belong to the same experimental block
+same_block = block_id(2:end) == block_id(1:end-1);
+
+% identify High/Low intensity changes between adjacent trials
+is_change = conds_str(2:end) ~= conds_str(1:end-1);
+
+% identify valid within-block transitions
+% deviant = first stimulus after an intensity change
+% standard = immediately preceding stimulus
+Dev_pos = find(is_change & same_block) + 1;
 Std_pos = Dev_pos - 1;
 
-% keep only Standard + Deviant trials
+% keep only Standard + Deviant trials in their original presentation order
 keep_pos = sort([Std_pos Dev_pos]);
 
 % extract the corresponding trial timing information
 new_trl = trl(keep_pos, :);
 
-% create new Standard/Deviant labels and assign them to the trials
+% assign Standard/Deviant labels
 new_conditionlabels = cell(length(keep_pos), 1);
 new_conditionlabels(1:2:end) = {'Standard'};
 new_conditionlabels(2:2:end) = {'Deviant'};
