@@ -223,8 +223,8 @@ fprintf('Total:           %d trials\n', nHigh + nLow);
 %===================================================================================
 %% Baseline correction H1
 
-% We want to do explicit custom baseline correction from [-100, -5].
-
+% baseline-correct each epoch using the mean EEG amplitude from -100 to -5 ms 
+% relative to stimulus onset
 S = [];
 S.D = D;
 S.timewin = [-100 -5];
@@ -234,25 +234,27 @@ D = spm_eeg_bc(S);
 %===================================================================================
 %% Epoching H2
 
+% load the original trial definition
+% --> there is a script to generate this file on this repo!
 load('/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/preprocessing_ID01/trialdef.mat')
 
+% convert condition labels to a string array
 conds_str = string(conditionlabels);
 
-% Find where the condition changes
+% identify intensity transitions
+% a) deviant = trial immediately after each change
+% b) standard = trial immediately before each change
 Dev_pos = find(conds_str(2:end) ~= conds_str(1:end-1)) + 1;
-
-% The trial immediately before each change is the Standard
 Std_pos = Dev_pos - 1;
 
-% Keep only Standard + Deviant trials
+% keep only Standard + Deviant trials
 keep_pos = sort([Std_pos Dev_pos]);
 
-% Extract the corresponding trials
+% extract the corresponding trial timing information
 new_trl = trl(keep_pos, :);
 
-% Create new Standard/Deviant labels
+% create new Standard/Deviant labels and assign them to the trials
 new_conditionlabels = cell(length(keep_pos), 1);
-
 new_conditionlabels(1:2:end) = {'Standard'};
 new_conditionlabels(2:2:end) = {'Deviant'};
 
@@ -272,18 +274,18 @@ S.prefix = 'std_dev_';
 D = spm_eeg_epochs(S);
 
 % number of trials in each condition
-nHigh = sum(strcmp(D.conditions, 'Standard'));
-nLow  = sum(strcmp(D.conditions, 'Deviant'));
+nStandard = sum(strcmp(D.conditions, 'Standard'));
+nDeviant  = sum(strcmp(D.conditions, 'Deviant'));
 
-fprintf('Standard condition: %d trials\n', nHigh);
-fprintf('Deviant condition:  %d trials\n', nLow);
-fprintf('Total:           %d trials\n', nHigh + nLow);
+fprintf('Standard condition: %d trials\n', nStandard);
+fprintf('Deviant condition:  %d trials\n', nDeviant);
+fprintf('Total:               %d trials\n', nStandard + nDeviant);
 
 %===================================================================================
 %% Baseline correction H2
 
-% We want to do explicit custom baseline correction from [-100, -5].
-
+% baseline-correct each epoch using the mean EEG amplitude from -100 to -5 ms 
+% relative to stimulus onset
 S = [];
 S.D = D;
 S.timewin = [-100 -5];
@@ -293,7 +295,7 @@ D = spm_eeg_bc(S);
 %===================================================================================
 %% Artefact removal H1
 
-% identify epochs in which an EEG channel exceeds 80 µV
+% reject epochs containing residual EEG amplitudes exceeding ±80 µV
 S = [];
 S.D = 'beTfdfMinterpolate_SPNCartoons_ID01.mat';
 S.mode = 'reject';
@@ -312,8 +314,7 @@ D = spm_eeg_artefact(S);
 %===================================================================================
 %% Artefact removal H2
 
-% identify epochs in which an EEG channel exceeds 80 µV
-
+% reject epochs containing residual EEG amplitudes exceeding ±80 µV
 S = [];
 S.D = 'bstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
 S.mode = 'reject';
