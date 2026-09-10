@@ -204,10 +204,8 @@ S.trialdef(2).eventtype = 'STATUS';
 S.trialdef(2).eventvalue = 2;
 S.trialdef(2).trlshift = 0;
 
-% apply baseline correction
-% i.e. SPM uses the pre-stimulus period [-100 to 0ms] as baseline and subtracts the 
-% baseline from every other time point in the epoch
-S.bc = 1;
+% do NOT use SPM's default baseline correction
+S.bc = 0;
 
 % create epoched dataset
 S.prefix = 'e';
@@ -221,6 +219,17 @@ nLow  = sum(strcmp(D.conditions, 'Low'));
 fprintf('High condition: %d trials\n', nHigh);
 fprintf('Low condition:  %d trials\n', nLow);
 fprintf('Total:           %d trials\n', nHigh + nLow);
+
+%===================================================================================
+%% Baseline correction H1
+
+% We want to do explicit custom baseline correction from [-100, -5].
+
+S = [];
+S.D = D;
+S.timewin = [-100 -5];
+S.prefix = 'b';
+D = spm_eeg_bc(S);
 
 %===================================================================================
 %% Epoching H2
@@ -254,6 +263,11 @@ S.D = 'TfdfMinterpolate_SPNCartoons_ID01.mat';
 S.timewin = [-100 400];
 S.trl = new_trl;
 S.conditionlabels = new_conditionlabels; 
+
+% do NOT use SPM's default baseline correction
+S.bc = 0;
+
+% create epoched dataset
 S.prefix = 'std_dev_';
 D = spm_eeg_epochs(S);
 
@@ -266,11 +280,22 @@ fprintf('Deviant condition:  %d trials\n', nLow);
 fprintf('Total:           %d trials\n', nHigh + nLow);
 
 %===================================================================================
+%% Baseline correction H2
+
+% We want to do explicit custom baseline correction from [-100, -5].
+
+S = [];
+S.D = D;
+S.timewin = [-100 -5];
+S.prefix = 'b';
+D = spm_eeg_bc(S);
+
+%===================================================================================
 %% Artefact removal H1
 
 % identify epochs in which an EEG channel exceeds 80 µV
 S = [];
-S.D = 'eTfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = 'beTfdfMinterpolate_SPNCartoons_ID01.mat';
 S.mode = 'reject';
 S.badchanthresh = 0.2;
 S.methods.channels = {'EEG'};
@@ -290,7 +315,7 @@ D = spm_eeg_artefact(S);
 % identify epochs in which an EEG channel exceeds 80 µV
 
 S = [];
-S.D = 'std_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = 'bstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
 S.mode = 'reject';
 S.badchanthresh = 0.2;
 S.methods.channels = {'EEG'};
@@ -311,7 +336,7 @@ D = spm_eeg_artefact(S);
 
 % estimate ERP for each condition using robust averaging
 S = [];
-S.D = 'aeTfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = 'abeTfdfMinterpolate_SPNCartoons_ID01.mat';
 S.robust.ks = 3;
 S.robust.bycondition = false;
 S.robust.savew = false;
@@ -327,7 +352,7 @@ D = spm_eeg_average(S);
 % waveform. We therefore re-apply the 30 Hz low-pass filter to the robust average.
 
 S = [];
-S.D = 'maeTfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = 'mabeTfdfMinterpolate_SPNCartoons_ID01.mat';
 S.type = 'butterworth';
 S.band = 'low';
 S.freq = 30;
@@ -341,7 +366,7 @@ D = spm_eeg_filter(S);
 
 % estimate ERP for each condition using robust averaging
 S = [];
-S.D = 'astd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = 'abstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
 S.robust.ks = 3;
 S.robust.bycondition = false;
 S.robust.savew = false;
@@ -357,7 +382,7 @@ D = spm_eeg_average(S);
 % waveform. We therefore re-apply the 30 Hz low-pass filter to the robust average.
 
 S = [];
-S.D = 'mastd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = 'mabstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
 S.type = 'butterworth';
 S.band = 'low';
 S.freq = 30;
