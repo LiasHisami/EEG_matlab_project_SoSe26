@@ -34,3 +34,34 @@ S.save = 1;
 % 'trl' contains timing information for each trial
 % 'conditionlabels' contains High/Low label in order
 [trl, conditionlabels, S] = spm_eeg_definetrial(S); 
+
+%===================================================================================
+% Assign trials to experimental blocks
+
+% load events from the same EEG dataset
+D = spm_eeg_load(S.D);
+ev = events(D);
+
+% STATUS trigger 124 marks the beginning of each experimental block
+block_events = ev(strcmp({ev.type}, 'STATUS') & string({ev.value}) == "124");
+block_times = [block_events.time];
+
+% determine stimulus onset time for each trial
+% trl(:,1) is the epoch start sample; add 100 ms because epochs begin 100 ms before onset
+trial_times = (trl(:,1) - 1) ./ D.fsample + 0.100;
+
+% assign each stimulus trial to the most recent preceding block-start marker
+block_id = zeros(size(trial_times));
+
+% sanity: check that all trials were assigned to a block
+assert(all(block_id > 0), 'At least one stimulus trial could not be assigned to a block.');
+
+% sanity: check that all 12 experimental blocks are represented
+fprintf('Number of blocks identified: %d\n', length(unique(block_id)));
+
+for i = 1:length(trial_times)
+    block_id(i) = find(block_times <= trial_times(i), 1, 'last');
+end
+
+% save variables required for Standard/Deviant classification
+save('trialdef.mat', 'trl', 'conditionlabels', 'block_id');
