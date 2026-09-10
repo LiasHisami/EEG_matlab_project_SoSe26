@@ -270,6 +270,7 @@ S.conditionlabels = new_conditionlabels;
 S.bc = 0;
 
 % create epoched dataset
+S.eventpadding = 0;
 S.prefix = 'std_dev_';
 D = spm_eeg_epochs(S);
 
