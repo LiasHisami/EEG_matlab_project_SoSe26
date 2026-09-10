@@ -236,10 +236,13 @@ D = spm_eeg_bc(S);
 
 % load the original trial definition
 % --> there is a script to generate this file on this repo!
-load('/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/preprocessing_ID01/trialdef.mat')
+load(fullfile(project_root, 'trialdef.mat'));
 
-% convert condition labels to a string array
-conds_str = string(conditionlabels);
+% convert condition labels to a column string array
+conds_str = string(conditionlabels(:));
+
+% ensure block IDs are also a column vector
+block_id = block_id(:);
 
 % identify adjacent trials that belong to the same experimental block
 same_block = block_id(2:end) == block_id(1:end-1);
@@ -248,15 +251,13 @@ same_block = block_id(2:end) == block_id(1:end-1);
 is_change = conds_str(2:end) ~= conds_str(1:end-1);
 
 % identify valid within-block transitions
-% deviant = first stimulus after an intensity change
-% standard = immediately preceding stimulus
 Dev_pos = find(is_change & same_block) + 1;
 Std_pos = Dev_pos - 1;
 
-% keep only Standard + Deviant trials in their original presentation order
-keep_pos = sort([Std_pos Dev_pos]);
+% keep Standard + Deviant trials in presentation order
+keep_pos = sort([Std_pos; Dev_pos]);
 
-% extract the corresponding trial timing information
+% extract corresponding trials
 new_trl = trl(keep_pos, :);
 
 % assign Standard/Deviant labels
