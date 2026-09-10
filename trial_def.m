@@ -2,8 +2,9 @@
 % Trial Definition for Standard vs. Deviant Analysis
 
 % set project root and working directory
-project_root = '/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/preprocessing_ID01';
+project_root = '/Users/lotte/Documents/MATLAB/EEG_matlab_project_SoSe26/Group2';
 cd(project_root);
+addpath '/Users/lotte/Documents/MATLAB/spm'
 
 % specify the preprocessed EEG dataset
 S = [];
@@ -42,8 +43,15 @@ S.save = 1;
 D = spm_eeg_load(S.D);
 ev = events(D);
 
-% STATUS trigger 124 marks the beginning of each experimental block
-block_events = ev(strcmp({ev.type}, 'STATUS') & string({ev.value}) == "124");
+% keep only STATUS events
+is_status = strcmp({ev.type}, 'STATUS');
+status_events = ev(is_status);
+
+% convert STATUS values to numeric values
+status_values = cellfun(@double, {status_events.value});
+
+% STATUS trigger 124 marks block starts
+block_events = status_events(status_values == 124);
 block_times = [block_events.time];
 
 % determine stimulus onset time for each trial
@@ -53,14 +61,19 @@ trial_times = (trl(:,1) - 1) ./ D.fsample + 0.100;
 % assign each stimulus trial to the most recent preceding block-start marker
 block_id = zeros(size(trial_times));
 
+for i = 1:length(trial_times)
+    block_id(i) = find(block_times <= trial_times(i), 1, 'last');
+end
+
 % sanity: check that all trials were assigned to a block
 assert(all(block_id > 0), 'At least one stimulus trial could not be assigned to a block.');
 
 % sanity: check that all 12 experimental blocks are represented
 fprintf('Number of blocks identified: %d\n', length(unique(block_id)));
 
-for i = 1:length(trial_times)
-    block_id(i) = find(block_times <= trial_times(i), 1, 'last');
+% print number of stimulus trials within each block
+for b = unique(block_id)'
+    fprintf('Block %d: %d trials\n', b, sum(block_id == b));
 end
 
 % save variables required for Standard/Deviant classification
