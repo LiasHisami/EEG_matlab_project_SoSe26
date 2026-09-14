@@ -1,10 +1,8 @@
 % Load averaged file
+D = spm_eeg_load('averaged_data/fmabeTfdfMinterpolate_SPNCartoons_ID01.mat');
 
-D = spm_eeg_load('averaged_data/fmabstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat');
-
-% Average across channels P2, CP2, P4, CP4 for H2 (N140)
-chan_names = {'P2', 'CP2', 'P4', 'CP4'};
-
+% Average across channels 'FC4', 'C4', 'CP4', 'C6'
+chan_names = {'FC4', 'C4', 'CP4', 'C6'};
 chan_idx   = find(ismember(D.chanlabels, chan_names));
 
 % Sanity check: make sure all channels were found
