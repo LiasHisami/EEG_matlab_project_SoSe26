@@ -3,7 +3,11 @@
 D = spm_eeg_load('averaged_data/fmabstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat');
 
 % Average across channels P2, CP2, P4, CP4 for H2 (N140)
-chan_names = {'P2', 'CP2', 'P4', 'CP4'};
+% chan_names = {'P2', 'CP2', 'P4', 'CP4'};  %choose a version
+
+% Average across channels 'C4', 'C6', 'CP2', 'CP4', 'CP6'
+chan_names = {'C4', 'C6', 'CP2', 'CP4', 'CP6'};
+
 
 chan_idx   = find(ismember(D.chanlabels, chan_names));
 
