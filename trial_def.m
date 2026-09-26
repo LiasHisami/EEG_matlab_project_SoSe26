@@ -1,14 +1,19 @@
 %===================================================================================
 % Trial Definition for Standard vs. Deviant Analysis
 
-% set project root and working directory
-project_root = '/Users/lotte/Documents/MATLAB/EEG_matlab_project_SoSe26/Group2';
-cd(project_root);
-addpath '/Users/lotte/Documents/MATLAB/spm'
+% Can be run on its own (after preprocessing.m has created the TfdfM... file)
+% or is called automatically from preprocessing.m.
+% set the participant first, e.g.  participant = 'ID02'; trial_def
+if ~exist('participant', 'var'), participant = 'ID01'; end
+if ~exist('P', 'var') || ~isfield(P, 'id') || ~strcmp(P.id, participant)
+    cfg = project_config();
+    P = participant_paths(cfg, participant);
+end
+cd(P.outdir);
 
 % specify the preprocessed EEG dataset
 S = [];
-S.D = 'TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['TfdfMinterpolate_' P.base '.mat'];
 
 % define stimulus-locked trials from -100 to +400ms relative to stimulus onset
 S.timewin = [-100 400];
@@ -29,7 +34,7 @@ S.trialdef(2).trlshift = 0;
 S.reviewtrials = 0; 
 
 % save resulting trial definition
-S.save = 1; 
+S.save = 0; 
 
 % generate trial definition
 % 'trl' contains timing information for each trial
@@ -77,4 +82,4 @@ for b = unique(block_id)'
 end
 
 % save variables required for Standard/Deviant classification
-save('trialdef.mat', 'trl', 'conditionlabels', 'block_id');
+save(fullfile(P.outdir, 'trialdef.mat'), 'trl', 'conditionlabels', 'block_id');

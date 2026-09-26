@@ -1,6 +1,10 @@
-% Load averaged file
+% set the participant first, e.g.  participant = 'ID02'; plot_ERP_std_dev
+if ~exist('participant', 'var'), participant = 'ID01'; end
+cfg = project_config();
+P = participant_paths(cfg, participant);
 
-D = spm_eeg_load('averaged_data/fmabstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat');
+% Load averaged file (H2: Standard vs Deviant)
+D = spm_eeg_load(fullfile(P.outdir, ['fmabstd_dev_TfdfMinterpolate_' P.base '.mat']));
 
 % Average across channels P2, CP2, P4, CP4 for H2 (N140)
 % chan_names = {'P2', 'CP2', 'P4', 'CP4'};  %choose a version
@@ -44,3 +48,6 @@ ylabel('Amplitude (\muV)', 'FontSize', 12);
 legend('FontSize', 11);
 title(['ERP - average (' strjoin(chan_names, ', ') ')'], 'FontSize', 14);
 grid on; box off;
+
+% save the figure in the participant's plots folder
+exportgraphics(gcf, fullfile(P.plotdir, 'ERP_std_dev.png'), 'Resolution', 200);

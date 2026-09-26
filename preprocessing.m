@@ -5,19 +5,23 @@
 %===================================================================================
 %% Setup
 
-% clear workspace and command window
-clear; clc; 
+% choose the participant: set the variable before running this script,
+%   e.g.  participant = 'ID02'; preprocessing
+% (or run all participants with run_all_participants)
+if ~exist('participant', 'var'), participant = 'ID01'; end
 
-% set project root
-project_root = '/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/preprocessing_ID01';
+% clear workspace (except the participant) and command window
+clearvars -except participant run_state   % run_state: loop state of run_all_participants
+clc
 
-% add path to spm and to the brewermap package
-spm_path = '/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/MATLAB/spm25';
-addpath(spm_path);
-addpath('/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/DrosteEffect-BrewerMap-b373eab');
+% paths come from project_config.m / config_local.m (nothing hard-coded here);
+% this also adds SPM and BrewerMap to the MATLAB path
+cfg = project_config();
+P = participant_paths(cfg, participant);
 
-% set the current directory to the project root
-cd(project_root);
+% all SPM files of this participant are written to (and read from) its output folder
+cd(P.outdir);
+fprintf('Participant %s: %s -> %s\n', P.id, P.bdf, P.outdir);
 
 % initialise SPM
 spm('defaults', 'EEG');
@@ -27,14 +31,14 @@ spm('defaults', 'EEG');
 
 % convert from .bdf format to SPM's format
 S = [];
-S.dataset = '/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/group1/01EEG/SPNCartoons_ID01.bdf';
+S.dataset = P.bdf;
 S.mode = 'continuous';
 S.channels = {'EEG', 'EXG1', 'EXG2', 'EXG3', 'EXG4'};
 S.eventpadding = 0;
 S.blocksize = 3276800;
 S.checkboundary = 1;
 S.saveorigheader = 0;
-S.outfile = 'SPNCartoons_ID01';
+S.outfile = P.base;
 S.conditionlabels = {'Undefined'};
 S.inputformat = [];
 D = spm_eeg_convert(S);
@@ -54,7 +58,7 @@ S = [];
 S.D = D;
 S.task = 'loadeegsens';
 S.source = 'locfile';
-S.sensfile = '/Users/vanessaobi/Documents/Uni/Master/SS 26/EEG/project/group1/00Behavioural/neuronavigation/SPNCartoons_ID01.sfp';
+S.sensfile = P.sfp;
 D = spm_eeg_prep(S);
 
 %===================================================================================
@@ -62,21 +66,22 @@ D = spm_eeg_prep(S);
 
 % The function "spm_interpolate_bad_channels" opens the FieldTrip data browser. We 
 % visually inspect the EEG and decide which signals are bad. We visually identified 
-% only CP3 to be bad for ~20% of the time. We therefore have to interpolate it.
+% only CP3 to be bad for ~20% of the time (ID01). We therefore have to interpolate it.
 
-% enter {'CP3'} to interpolate the channel
-D = spm_interpolate_bad_channels(D);
+% bad channels are read from bad_channels.tsv (e.g. ID01 -> CP3);
+% if the participant is not listed there, you are asked to type them in
+D = spm_interpolate_bad_channels(D, P.bad_channels);
 
 %===================================================================================
 %% Montage
 
 % re-references the EEG channels to the average reference
 S = [];
-S.D = 'interpolate_SPNCartoons_ID01.mat'; 
+S.D = ['interpolate_' P.base '.mat']; 
 S.mode = 'write';
 S.blocksize = 655360;
 S.prefix = 'M';
-S.montage = 'avref_eog.mat';
+S.montage = fullfile(cfg.code_dir, 'avref_eog.mat');
 S.keepothers = 1;
 S.keepsensors = 1;
 S.updatehistory = 1;
@@ -88,7 +93,7 @@ D = spm_eeg_montage(S);
 % We apply a 0.1 Hz high-pass filter.
 
 S = [];
-S.D = 'Minterpolate_SPNCartoons_ID01.mat';
+S.D = ['Minterpolate_' P.base '.mat'];
 S.type = 'butterworth';
 S.band = 'high';
 S.freq = 0.1;
@@ -103,7 +108,7 @@ D = spm_eeg_filter(S);
 % We downsample to 200 Hz.
 
 S = [];
-S.D = 'fMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['fMinterpolate_' P.base '.mat'];
 S.fsample_new = 200;
 S.prefix = 'd';
 D = spm_eeg_downsample(S);
@@ -114,7 +119,7 @@ D = spm_eeg_downsample(S);
 % We apply a 30 Hz low-pass filter.
 
 S = [];
-S.D = 'dfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['dfMinterpolate_' P.base '.mat'];
 S.type = 'butterworth';
 S.band = 'low';
 S.freq = 30;
@@ -128,7 +133,7 @@ D = spm_eeg_filter(S);
 
 % detect eyeblinks and mark them as events
 S = [];
-S.D = 'fdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['fdfMinterpolate_' P.base '.mat'];
 S.mode = 'mark'; % Change 'Mode' to 'Mark'
 S.methods.fun = 'eyeblink'; % Detection algorithm
 S.methods.settings.threshold = 4;
@@ -149,7 +154,8 @@ S.trialdef(1).eventvalue = 'VEOG';
 S.prefix = 'eyeblink';
 D_ebf = spm_eeg_epochs(S); 
 
-pause
+% pause only when working interactively (not in a headless / batch run)
+if cfg.interactive, pause; end
 
 % average all blink epochs
 S = []; 
@@ -187,7 +193,7 @@ fprintf('Current dataset: %s\n', D.fname);
 % segment recording into stimulus-locked epochs
 % epochs of -100 to +400ms relative to stimulus onset
 S = [];
-S.D = 'TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['TfdfMinterpolate_' P.base '.mat'];
 S.timewin = [-100 400];
 
 % Trials are assigned to High or Low based on the STATUS triggers.
@@ -235,8 +241,11 @@ D = spm_eeg_bc(S);
 %% Epoching H2
 
 % load the original trial definition
-% --> there is a script to generate this file on this repo!
-load(fullfile(project_root, 'trialdef.mat'));
+% --> generated by trial_def.m; run it here if it does not exist yet for this participant
+if ~isfile(fullfile(P.outdir, 'trialdef.mat'))
+    trial_def;
+end
+load(fullfile(P.outdir, 'trialdef.mat'));
 
 % convert condition labels to a column string array
 conds_str = string(conditionlabels(:));
@@ -268,7 +277,7 @@ new_conditionlabels(2:2:end) = {'Deviant'};
 % segment recording into stimulus-locked epochs
 % epochs of -100 to +400ms relative to stimulus onset
 S = [];
-S.D = 'TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['TfdfMinterpolate_' P.base '.mat'];
 S.timewin = [-100 400];
 S.trl = new_trl;
 S.conditionlabels = new_conditionlabels; 
@@ -305,7 +314,7 @@ D = spm_eeg_bc(S);
 
 % reject epochs containing residual EEG amplitudes exceeding ±80 µV
 S = [];
-S.D = 'beTfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['beTfdfMinterpolate_' P.base '.mat'];
 S.mode = 'reject';
 S.badchanthresh = 0.2;
 S.methods.channels = {'EEG'};
@@ -324,7 +333,7 @@ D = spm_eeg_artefact(S);
 
 % reject epochs containing residual EEG amplitudes exceeding ±80 µV
 S = [];
-S.D = 'bstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['bstd_dev_TfdfMinterpolate_' P.base '.mat'];
 S.mode = 'reject';
 S.badchanthresh = 0.2;
 S.methods.channels = {'EEG'};
@@ -338,14 +347,14 @@ D = spm_eeg_artefact(S);
 % check the bad segments (does it make sense?)
 % display_SPM_data(D)
 
-% 199 rejected trials
+% (ID01: 199 rejected trials)
 
 %===================================================================================
 %% Robust Averaging H1
 
 % estimate ERP for each condition using robust averaging
 S = [];
-S.D = 'abeTfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['abeTfdfMinterpolate_' P.base '.mat'];
 S.robust.ks = 3;
 S.robust.bycondition = false;
 S.robust.savew = false;
@@ -361,7 +370,7 @@ D = spm_eeg_average(S);
 % waveform. We therefore re-apply the 30 Hz low-pass filter to the robust average.
 
 S = [];
-S.D = 'mabeTfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['mabeTfdfMinterpolate_' P.base '.mat'];
 S.type = 'butterworth';
 S.band = 'low';
 S.freq = 30;
@@ -375,7 +384,7 @@ D = spm_eeg_filter(S);
 
 % estimate ERP for each condition using robust averaging
 S = [];
-S.D = 'abstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['abstd_dev_TfdfMinterpolate_' P.base '.mat'];
 S.robust.ks = 3;
 S.robust.bycondition = false;
 S.robust.savew = false;
@@ -391,7 +400,7 @@ D = spm_eeg_average(S);
 % waveform. We therefore re-apply the 30 Hz low-pass filter to the robust average.
 
 S = [];
-S.D = 'mabstd_dev_TfdfMinterpolate_SPNCartoons_ID01.mat';
+S.D = ['mabstd_dev_TfdfMinterpolate_' P.base '.mat'];
 S.type = 'butterworth';
 S.band = 'low';
 S.freq = 30;

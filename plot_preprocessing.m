@@ -1,17 +1,21 @@
-spm('defaults', 'eeg');
+% set the participant first, e.g.  participant = 'ID02'; plot_preprocessing
+if ~exist('participant', 'var'), participant = 'ID01'; end
+cfg = project_config();
+P = participant_paths(cfg, participant);
+cd(P.outdir);
 
-% Settings
-chan_name = 'CP3';
+% Settings (the channel can be set beforehand, e.g. chan_name = 'C4';)
+if ~exist('chan_name', 'var'), chan_name = 'CP3'; end
 t_start   = 380;
 t_end     = 390;
 
 % Load each preprocessing stage
-D1 = spm_eeg_load('SPNCartoons_ID01.mat'); %raw
-D2 = spm_eeg_load('Minterpolate_SPNCartoons_ID01.mat'); %montage
-D3 = spm_eeg_load('fMinterpolate_SPNCartoons_ID01.mat'); % highpass filter
-D4 = spm_eeg_load('dfMinterpolate_SPNCartoons_ID01.mat'); %downsampled 
-D5 = spm_eeg_load('fdfMinterpolate_SPNCartoons_ID01.mat'); %lowpass filter
-D6 = spm_eeg_load('TfdfMinterpolate_SPNCartoons_ID01.mat'); % eyeblink removal
+D1 = spm_eeg_load([P.base '.mat']); %raw
+D2 = spm_eeg_load(['Minterpolate_' P.base '.mat']); %montage
+D3 = spm_eeg_load(['fMinterpolate_' P.base '.mat']); % highpass filter
+D4 = spm_eeg_load(['dfMinterpolate_' P.base '.mat']); %downsampled 
+D5 = spm_eeg_load(['fdfMinterpolate_' P.base '.mat']); %lowpass filter
+D6 = spm_eeg_load(['TfdfMinterpolate_' P.base '.mat']); % eyeblink removal
 
 % Find channel indices
 c1 = find(strcmp(D1.chanlabels, chan_name));
@@ -101,3 +105,6 @@ xlabel('time (s)', 'FontSize', 12);
 xlim([t_start t_end]);
 set(gca, 'YTick', [], 'Box', 'off');
 title(sprintf('Preprocessing steps - %s', chan_name), 'FontSize', 14)
+
+% save the figure in the participant's plots folder
+exportgraphics(gcf, fullfile(P.plotdir, ['preprocessing_' chan_name '.png']), 'Resolution', 200);
