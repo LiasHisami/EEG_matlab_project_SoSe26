@@ -1,5 +1,10 @@
-% Load averaged file
-D = spm_eeg_load('averaged_data/fmabeTfdfMinterpolate_SPNCartoons_ID01.mat');
+% set the participant first, e.g.  participant = 'ID02'; plot_ERP_high_low
+if ~exist('participant', 'var'), participant = 'ID01'; end
+cfg = project_config();
+P = participant_paths(cfg, participant);
+
+% Load averaged file (H1: High vs Low)
+D = spm_eeg_load(fullfile(P.outdir, ['fmabeTfdfMinterpolate_' P.base '.mat']));
 
 % Average across channels 'C4', 'C6', 'CP2', 'CP4', 'CP6'
 chan_names = {'C4', 'C6', 'CP2', 'CP4', 'CP6'};
@@ -38,3 +43,6 @@ ylabel('Amplitude (\muV)', 'FontSize', 12);
 legend('FontSize', 11);
 title(['ERP - average (' strjoin(chan_names, ', ') ')'], 'FontSize', 14);
 grid on; box off;
+
+% save the figure in the participant's plots folder
+exportgraphics(gcf, fullfile(P.plotdir, 'ERP_high_low.png'), 'Resolution', 200);

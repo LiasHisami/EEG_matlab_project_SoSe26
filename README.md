@@ -1,33 +1,4 @@
-## Current analysis goal
-
-For the minimum viable analysis, we are currently focusing on H1: the effect of physical stimulation intensity on the somatosensory ERP (P50 response in particular)
-The experiment contains two stimulation intensities: low-intensity and high-intensity stimulation
-
-The analysis currently compares the EEG response to these two conditions.
-TODO: If we have time, we can extend the analysis to H2 concerning standards/deviants in the roving paradigm.
-
-
-## Data
-**Important**: When downloading the raw data from the link Gian sent us, we are **GROUP 2**.
-It's a bit confusing because the EEG/behavioural data are labelled ID01 although we are Group 2.
-https://box.fu-berlin.de/s/wcqaegfkdkMZo3E?dir=/Group2
-
-So in summary:
-- for 00Behavioral and 01EEG, our participant is labelled ID01
-- for 05Anat, our participant is labelled Group2_defaced.nii
-
-
-## Requirements
-- MATLAB
-- SPM for EEG/MEG analysis
-- FieldTrip functions accessible from MATLAB/SPM
-- Brewermap package -> download here: https://github.com/DrosteEffect/BrewerMap/tree/master
-
-The custom bad-channel interpolation and data-display functions use FieldTrip functions such as ft_databrowser, ft_redefinetrial, and ft_channelrepair.
-
-used version: SPM25
-
-## Preprocessing:
+# Preprocessing:
 --> see preprocessing plots for CP3 (bad interpolated channel) and C4 (of interest for our P50 Hypothesis) and maybe AFz (due to eye blink detection)
 
 ### Bad-channel handling
@@ -36,9 +7,6 @@ used version: SPM25
 - Bad channel is CP3 -> interpolated
 - Parts of O2 and CP5 are also bad (from around 1600s to 2020s)
     -> removed during artefact detection (one long section from trial 1031 to 1274 (total around 244 ) see below 'Artefact detection'
-
-**For all additional participants:**
-  - TODO: decide which channels are considered bad
 
 ### Montage
 
@@ -68,15 +36,21 @@ used version: SPM25
 
 - time window: -100 to 400 ms
 - conditions:
-  - High : 1650 trials
-  - Low :  1697 trials
-Total:     3347 trials
+  - High: 1650 trials
+  - Low: 1697 trials
+  - Total: 3347 trials
 
 + Baseline correction: 1
 
 #### H2
 
-- TODO....
+- time window: -100 to 400 ms
+- conditions:
+  - Standard: 1650 trials
+  - Deviant: 1697 trials
+  - Total: 3347 trials
+
++ Baseline correction: 1
 
 ### Artefact detection
 
@@ -98,7 +72,7 @@ bad trials rejected:
 - Topographic plots around P50 (see plots folder)
 
 - ERP
-  - Electrodes that constitute our ROI: {'FC4', 'CP4', 'C4', 'C6'} (based on topography plot, might need to be changed for other participants and for H2)
+  - Electrodes that constitute our ROI: {'FC4', 'CP4', 'C4', 'C6'}
  
 
 ## Statistical analysis
@@ -112,33 +86,7 @@ bad trials rejected:
     1. Convert EEG data to scalp x time nifty images -> a 3D image for each trial of the two types with time as third dimension;  
     2. We then take these images into an unpaired t-test across trials (in a 2nd-level model) to compare the two events
     3. We can then use classical SPM to identify locations in space and time in which a reliable difference occurs, correcting across the multiple comparisons entailed
-   
-   SPM tutorial for detailed implementation of statistical analysis:
-  
-     - Select ‘Convert to images’ from the ‘Images’ dropdown menu. In the batch tool that will appear select the aefdfMspmeeg_subject1.mat as input. For the ‘Mode’ option select ‘scalp x time’. In the ‘Channel selection’ option delete the default choice (‘All’) and choose ‘Select channels by type’ with ‘EEG’ as the type selection. You can now run the batch.
-      
-     - SPM will take some time as it writes out a NIfTI image for each condition in a new directory called aefdfMspmeeg_subject1. In our case there will be two files , called condition_rare and condition_standard. These are 4D files, meaning that each file contains multiple 3D scalp x time images, corresponding to non-rejected trials. You can press “Display: images” to view one of these images. Change the number in the ‘Frames’ box to select a particular trial (first trial is the default). The image will have dimensions 3232101.
-      
-    To perform statistical inference on these images:
-    
-    - Create a new directory, eg. mkdir XYTstats.
-    
-    - Press the “Specify 2nd level” button.
-    
-    - Select “two-sample t-test” (unpaired t-test)
-    
-    - Define the images for “Group 1” as all those in the file condition_standard. To do that write ‘standard’ in the ‘Filter’ box and ‘Inf’ in the ‘Frames’ box of the file selector. All the frames will be shown. Right click on any of the frames in the list and choose ‘Select all’. Similarly for “Group 2” select the images from condition_rare file.
-    
-    - Finally, specify the new XYTstats directory as the output directory.
-    
-    - Press the “save” icon, top left, and save this design specification as mmn_design.mat and press “save”.
-    
-    - Press the green “Run” button to execute the job4 This will produce the design matrix for a two-sample t-test.
-    
-    - Now press “Estimate” in SPMs main window, and select the SPM.mat file from the XYTstats directory. 
 
-    - Now press “Results” and define a new F-contrast as [1 -1] (for help with these basic SPM functions, see eg. chapter [Chap:data:auditory]). Keep the default contrast options, but threshold at  FWE p < 0.05 corrected for the whole search volume and select “Scalp-Time” for the “Data Type”. Then press “whole brain”, and the Graphics window should now look like that in Figure 1.3. This reveals a large fronto-central region within the 2D sensor space and within the time epoch in which standard and rare trials differ reliably, having corrected for multiple F-tests across pixels/time. An F-test is used because the sign of the difference reflects the polarity of the ERP difference, which is not of primary interest.
- 
       
 ---
 
@@ -252,28 +200,3 @@ The current ERP plotting script averages activity across the selected right-hemi
 The main component of interest is the **P50**.
 
 ---
-
-# Possible future extension: H2
-
-If we have time, nalysis may later be extended to distinguish stimuli according to both:
-
-1. **Physical intensity**
-   - High
-   - Low
-
-2. **Roving-paradigm status**
-   - Standard
-   - Deviant
-
-This would result in four conditions:
-
-| Intensity | Status |
-|---|---|
-| High | Standard |
-| High | Deviant |
-| Low | Standard |
-| Low | Deviant |
-
----
-
-
