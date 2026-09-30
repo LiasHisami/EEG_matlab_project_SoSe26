@@ -5,7 +5,7 @@
 % or is called automatically from preprocessing.m.
 % set the participant first, e.g.  participant = 'ID02'; trial_def
 if ~exist('participant', 'var'), participant = 'ID01'; end
-if ~exist('P', 'var') || ~isfield(P, 'id') || ~strcmp(P.id, participant)
+if ~exist('cfg', 'var') || ~exist('P', 'var') || ~isfield(P, 'id') || ~strcmp(P.id, participant)
     cfg = project_config();
     P = participant_paths(cfg, participant);
 end
@@ -15,8 +15,9 @@ cd(P.outdir);
 S = [];
 S.D = ['TfdfMinterpolate_' P.base '.mat'];
 
-% define stimulus-locked trials from -100 to +400ms relative to stimulus onset
-S.timewin = [-100 400];
+% define stimulus-locked trials in the project's epoch window (cfg.epoch_win)
+timewin = cfg.epoch_win;
+S.timewin = timewin;
 
 % high-intensity trials = STATUS trigger 1
 S.trialdef(1).conditionlabel = 'High';
@@ -60,8 +61,8 @@ block_events = status_events(status_values == 124);
 block_times = [block_events.time];
 
 % determine stimulus onset time for each trial
-% trl(:,1) is the epoch start sample; add 100 ms because epochs begin 100 ms before onset
-trial_times = (trl(:,1) - 1) ./ D.fsample + 0.100;
+% trl(:,1) is the epoch start sample; epochs begin -timewin(1) ms before onset
+trial_times = (trl(:,1) - 1) ./ D.fsample - timewin(1) / 1000;
 
 % assign each stimulus trial to the most recent preceding block-start marker
 block_id = zeros(size(trial_times));
@@ -82,4 +83,4 @@ for b = unique(block_id)'
 end
 
 % save variables required for Standard/Deviant classification
-save(fullfile(P.outdir, 'trialdef.mat'), 'trl', 'conditionlabels', 'block_id');
+save(fullfile(P.outdir, 'trialdef.mat'), 'trl', 'conditionlabels', 'block_id', 'timewin');

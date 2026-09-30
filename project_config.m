@@ -6,6 +6,8 @@ cfg.out_root       = getenv('EEG_OUT_ROOT');                     % where SPM fil
 cfg.spm_path       = getenv('SPM_PATH');                         % SPM25 folder
 cfg.brewermap_path = getenv('BREWERMAP_PATH');                   % optional
 cfg.bad_channels_file = fullfile(cfg.code_dir, 'bad_channels.tsv');
+cfg.epoch_win      = [-100 500];                                % ms around stimulus onset (both hypotheses)
+cfg.baseline_win   = [-100 -5];                                 % ms, mean subtracted from every epoch
 cfg.interactive    = usejava('desktop');                         % false in matlab -batch
 
 if exist('config_local', 'file') == 2
