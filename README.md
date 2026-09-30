@@ -34,7 +34,7 @@
 
 #### H1
 
-- time window: -100 to 400 ms
+- time window: -100 to 500 ms (`cfg.epoch_win` in `project_config.m`)
 - conditions:
   - High: 1650 trials
   - Low: 1697 trials
@@ -44,7 +44,7 @@
 
 #### H2
 
-- time window: -100 to 400 ms
+- time window: -100 to 500 ms (`cfg.epoch_win` in `project_config.m`)
 - conditions:
   - Standard: 1650 trials
   - Deviant: 1697 trials
@@ -108,7 +108,7 @@ Currently does:
 7. Downsampling to 200 Hz
 8. 30 Hz low-pass filtering
 9. Eye-blink detection/correction
-10. Epoching from -100 to 400 ms
+10. Epoching from -100 to 500 ms (`cfg.epoch_win`)
 11. Artefact rejection
 12. Averaging by condition
 13. Final low-pass filtering
@@ -146,9 +146,9 @@ This script is optional for the main analysis but useful for checking the prepro
 
 ---
 
-## `plot_ERP.m`
+## `plot_ERP_high_low.m`
 
-Loads the final averaged EEG data and plots the **High- and Low-intensity ERPs** over the current right-hemisphere ROI.
+Loads the final averaged EEG data and plots the **High- and Low-intensity ERPs** over the right-hemisphere P50 ROI, with the P50 window shaded and the High - Low difference wave; window means go to `plots/ERP_high_low_window_means.csv`. Same layout as `plot_ERP_std_dev.m`.
 Run this **after preprocessing has been completed**.
 
 ---
@@ -171,7 +171,7 @@ Use this to inspect the effects of the different preprocessing stages.
 
 ---
 
-## 3. Run `plot_ERP.m`
+## 3. Run `plot_ERP_high_low.m` and `plot_ERP_std_dev.m`
 
 Use this to visualise the final **High vs Low** ERP comparison for H1.
 

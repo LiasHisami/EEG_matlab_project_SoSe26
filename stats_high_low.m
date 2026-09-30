@@ -23,3 +23,8 @@ opt.cluster_p = 0.001;    % cluster-forming threshold for the cluster-level tabl
 
 res_high_low = run_trial_stats(P, ['abeTfdfMinterpolate_' P.base '.mat'], 'High', 'Low', ...
                                contrasts, 'stats_high_low', opt);
+
+% The whole-epoch page above puts its cursor on the global maximum (85 ms for ID01). H1 is about the
+% P50, so this page restricts the search volume to the a priori P50 window (same as plot_ERP_high_low)
+% with small volume correction: cursor on the window maximum, p-values corrected for the window.
+res_high_low.P50 = stats_window_results(P, 'stats_high_low', 1, 'P50', [30 60]);

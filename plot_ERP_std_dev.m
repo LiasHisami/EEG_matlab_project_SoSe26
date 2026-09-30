@@ -16,7 +16,7 @@ rois(1).chans = {'FT8', 'T8', 'TP8', 'FC6', 'C6', 'CP6'};
 rois(1).win   = [109 172];                 % ms
 rois(2).name  = 'P300 MMR (central)';
 rois(2).chans = {'FCz', 'Cz', 'CPz', 'FC2', 'C2', 'CP2'};
-rois(2).win   = [246 418];                 % ms; epochs end at 400 ms, so only 246-400 is available
+rois(2).win   = [246 418];                 % ms (inside the -100..500 ms epoch)
 
 time  = D.time * 1000;                     % ms
 conds = conditions(D);
@@ -61,7 +61,7 @@ for r = 1:numel(rois)
     ylim(ax, yl); xlim(ax, [time(1) time(end)]);
     xlabel(ax, 'Time (ms)', 'FontSize', 12);
     ylabel(ax, 'Amplitude (\muV)', 'FontSize', 12);
-    title(ax, {rois(r).name, strjoin(rois(r).chans, ', ')}, 'FontSize', 12);
+    title(ax, rois(r).name, 'FontSize', 12);     % channels are listed in the CSV, not the title
     text(ax, mean(rois(r).win), yl(2), sprintf('dev-std = %.2f \\muV', summary{r, 6}), ...
         'HorizontalAlignment', 'center', 'VerticalAlignment', 'top', 'FontSize', 10);
     legend(ax, 'FontSize', 10, 'Location', 'southwest');
