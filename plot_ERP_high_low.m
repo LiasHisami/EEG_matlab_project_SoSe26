@@ -9,8 +9,8 @@ D = spm_eeg_load(fullfile(P.outdir, ['fmabeTfdfMinterpolate_' P.base '.mat']));
 % One ROI and time window per component, fixed a priori so that the High vs Low
 % comparison is not biased by the ROI selection. H1 concerns the P50: the early
 % somatosensory response contralateral to the (left-hand) stimulation, over the
-% right central-parietal electrodes; window from the group's replication analysis
-% (P50 peak at CP4, 30-60 ms; see wiki/replication-results.md).
+% right central-parietal electrodes; window 30-60 ms as in Giannini et al. (2026),
+% who use it for the P50 evoked response (their N140 window is 100-150 ms).
 rois(1).name  = 'P50 (right central-parietal)';
 rois(1).chans = {'C4', 'C6', 'CP2', 'CP4', 'CP6'};
 rois(1).win   = [30 60];                   % ms
